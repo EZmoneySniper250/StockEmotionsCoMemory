@@ -44,3 +44,6 @@ updated: 2026-10-12
 - Spark UI：4040 端口是 notebook 的会话，同时用 `exec` 跑的任务在 4041。
 - JupyterLab 的 token 是 `.env` 里的 `JUPYTER_TOKEN`，端口只绑定本机。
 - dbt step 用的是 step 级别的 `working-directory`，相对路径从仓库根目录算，所以 CI 里要写完整路径 `infra/local/dbt`。
+- grokbot X 试跑（2026-10-15）：`search_posts_all` 间歇性整页丢字段，25 页里 7 页整页没有 `lang`、`conversation_id`、`entities`、`possibly_sensitive`、`context_annotations`，导入时这些字段要允许为空 (jaylen)
+- grokbot X 试跑（2026-10-15）：query 上限 1024 字符（>512 也接受），82 个 `from:` 要拆两段 (jaylen)
+- grokbot X 试跑（2026-10-15）：wrapper 在 JSON 后附一行非 JSON 的额度文本，直接 `json.loads` 会失败，要先切掉存进 `notes` (jaylen)
