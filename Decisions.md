@@ -36,6 +36,9 @@ updated: 2026-10-12
 | 2026-10-14 | X 分三路：`kol`（白名单原帖）、`kol_replies`（`to:` 评论区，加 `-has:links`）、`crowd`（cashtag，主信号，不能被白名单替代） | 白名单是按今天的名气挑的，有前视偏差，所以要带 `added_on`/`removed_on` 做版本管理；`-has:links` 会把图表截图一起筛掉，只用在评论区 |
 | 2026-10-14 | grokbot 信封按它的实际能力降级（spec v1.2）：`response` 保留 grokbot 包过一层的原样，用 `response_format` 标记，多出来的字段到 Silver 再去掉；`call_status`/`error_message` 替代 `http_status`，`quota` 替代 `rate_limit`；时间取调用前后 | grokbot 走的是工具层，拿不到原始 HTTP 响应、状态码和响应头；时间误差 <1 秒，而且偏晚，对 PIT 是安全的 |
 | 2026-10-12 | 采集落地目录从 `<lake>/brz/raw_<source>/` 改成 `<lake>/landing/<table>/` | 原路径和 Delta 表目录重叠，VACUUM 会删掉未被 log 记录的 JSONL |
+| 2026-10-15 | **X 黑名单 v1**：8 个账号，原因代码分 `scam` / `promo` / `bot`，以 `user_id` 为主键；关键词只用短语（`"check DM"`、`"Contact me"`、`"WhatsApp group"`、`"join my WhatsApp"`）。文件放代码仓库 `infra/local/config/x_lists/blacklist.yml` | 出现次数多不算证据，要有行为证据；spam 号经常改名，只认 username 会失效；单词 `"WhatsApp"` 会误杀 $META 新闻；query 上限 1024 字符，只有 `in_query: true` 的账号进 query，其余交给 Silver；`stock<Name><数字>` 这类成批换号的团伙交给 Silver 的正则规则 (jerry) |
+| 2026-10-15 | grokbot spec 升到 v1.3：新增 `response_trailer`；`params` 和 `endpoint` 按实际发送的名字记录；`fetched_at` 容忍度 10 秒；query 上限 1024；建议每 15 分钟抓 1–2 页 | 都来自 jaylen 2026-10-15 的试跑（见 [[2026-10-15 jaylen grokbot X trial run]]） (jerry) |
+| 2026-10-15 | **翻页链没翻完时，Silver 的发帖量按"每分钟帖子数"算**，覆盖时长 = 链上最老到最新一条帖子的 `created_at` 之差；缺 `entities` 的页，cashtag 退回正则匹配 | 有页数上限时，越热的票覆盖的时间越短，原始条数会低估热度；试跑里 25 页有 7 页整页缺 `entities` (jerry) |
 
 ## 提议了但还没拍板
 - 2026-10-14 grokbot 输出规范 `docs/grokbot_x_spec.md`（信封 + `fetched_at` + 请求参数 + 补字段 + 空/失败页也输出 + since_id 翻页到底）。交给 grokbot 后，`x_raw_search.yml` 要跟着改（加 `fetched_ts`/`request_id`/`page_index`/`http_status`，`request_*` 改不可空，PIT 用 `fetched_ts`）
