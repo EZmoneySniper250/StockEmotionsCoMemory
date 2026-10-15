@@ -6,7 +6,7 @@ repo: D:\USStockEmotions
 
 # USStockEmotions — 入口
 
-> 任何 Claude session 在这个项目上动手前，先读这一页，再按需读下面的笔记。写回规则见 [[Claude Memory Protocol]]。
+> 任何 AI session 在这个项目上动手前，先读 [[AGENTS]]（读写规则和 git 规则），再读这一页，然后按需读下面的笔记。人类的设置说明见 [[README]]。
 
 ## 一句话
 把散户在社交媒体上的讨论（StockTwits、Reddit、X、小红书）变成**可回测、point-in-time 正确的情绪信号**，覆盖市场、行业、个股三个粒度；规则触发告警，agent 只负责解释告警（**rules decide, the agent explains**）。
@@ -40,7 +40,4 @@ repo: D:\USStockEmotions
 - `docs/grokbot_x_trial_prompt.md`：grokbot 试跑 prompt（Jerry 在 Grok 上手动验证，S3 还没部署）
 
 ## Sessions
-- [[2026-10-10 Infra setup]]
-- [[2026-10-12 Progress review and memory migration]]
-- [[2026-10-12 XHS connectivity test]]
-- [[2026-10-14 grokbot X spec]]
+`Sessions/` 文件夹里每个 session 一篇，文件名是 `YYYY-MM-DD <作者> <主题>`，按文件名排序就是时间顺序。这里**不再手动维护列表**，因为多人同时追加容易冲突。

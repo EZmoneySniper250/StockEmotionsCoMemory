@@ -7,7 +7,7 @@ updated: 2026-10-12
 
 | 成员 | 负责领域 | 文件夹 |
 |---|---|---|
-| **Jerry**（用户本人，见 [[About Jerry]]） | 采集、存储、Bronze/Silver/Gold 管道、DQ、基建、CI/CD | `infra/`、`.github/`、`docs/` |
+| **Jerry** | 采集、存储、Bronze/Silver/Gold 管道、DQ、基建、CI/CD | `infra/`、`.github/`、`docs/` |
 | Linan | 标签 schema（和 Jaylen 一起）、score/alert 规则、模型训练、验证 | `modeling/`、`labeling/schema/`、`labeling/prompts/`、`infra/local/dbt/models/gld/scoring/`、`.../alerting/` |
 | Jaylen | Topic 分类体系、LLM 标签抽检、投资假设、结果复盘 | `research/`、`labeling/taxonomy/`、`labeling/spot_checks/` |
 

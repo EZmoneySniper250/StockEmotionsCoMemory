@@ -10,7 +10,7 @@ source: docs/dev_plan.md §1, §7
 - 主干开发，`main` 必须一直是绿的；短分支命名 `feat/<表或领域>`、`fix/...`、`chore/...`
 - 一个 PR = 一张表或一块完整的基建，大约 400 行以内；CI 绿 + 1 个 reviewer
 - Conventional commits，例如 `feat(slv.posts): ...`
-- **git 操作由 Jerry 自己做**（见 [[About Jerry]]）
+- **代码仓库的 git 操作由 Jerry 自己做**（记忆 repo 的规则见 [[AGENTS]] §3）
 
 ## 每张表的 8 步（先写合约）
 1. 合约：grain、PK、列、分区 → `contracts/<layer>/<table>.yml`（复制 `_template.yml`）或 Gold 的 dbt YAML。**写代码之前先 review**
