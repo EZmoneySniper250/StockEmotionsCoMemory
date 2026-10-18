@@ -39,6 +39,11 @@ updated: 2026-10-12
 | 2026-10-15 | **X 黑名单 v1**：8 个账号，原因代码分 `scam` / `promo` / `bot`，以 `user_id` 为主键；关键词只用短语（`"check DM"`、`"Contact me"`、`"WhatsApp group"`、`"join my WhatsApp"`）。文件放代码仓库 `infra/local/config/x_lists/blacklist.yml` | 出现次数多不算证据，要有行为证据；spam 号经常改名，只认 username 会失效；单词 `"WhatsApp"` 会误杀 $META 新闻；query 上限 1024 字符，只有 `in_query: true` 的账号进 query，其余交给 Silver；`stock<Name><数字>` 这类成批换号的团伙交给 Silver 的正则规则 (jerry) |
 | 2026-10-15 | grokbot spec 升到 v1.3：新增 `response_trailer`；`params` 和 `endpoint` 按实际发送的名字记录；`fetched_at` 容忍度 10 秒；query 上限 1024；建议每 15 分钟抓 1–2 页 | 都来自 jaylen 2026-10-15 的试跑（见 [[2026-10-15 jaylen grokbot X trial run]]） (jerry) |
 | 2026-10-15 | **翻页链没翻完时，Silver 的发帖量按"每分钟帖子数"算**，覆盖时长 = 链上最老到最新一条帖子的 `created_at` 之差；缺 `entities` 的页，cashtag 退回正则匹配 | 有页数上限时，越热的票覆盖的时间越短，原始条数会低估热度；试跑里 25 页有 7 页整页缺 `entities` (jerry) |
+| 2026-10-18 | **grokbot 输出接口冻结**（spec v1.4 §0）：envelope、manifest、文件命名、时间戳、`query_id` 前缀、名单文件格式都不能改，加字段也不行；要改只能向代码仓库提 PR 改 spec，由 jerry 批准并升版本号。query、名单内容、页数上限、轮询间隔、prompt 措辞可以自由改。摘要见 [[X Collector]] | trial 2 检查 0 FAIL，格式可用；冻结之后 jaylen 改 prompt 和 jerry 写 loader / Silver 可以同时进行，互不阻塞 (jerry) |
+| 2026-10-18 | **翻页遇到短页就停**：一页不满 `max_results`（25）就结束，记 `exhausted: true`，哪怕带着 `next_token` | grokbot 在短页上也返回 `next_token`；trial 2 里短页之后的 13 页有 12 页是空的，1 页只有 1 条，省调用、几乎不丢数据 (jerry) |
+| 2026-10-18 | **crowd 流在 Silver 必须按 cashtag 过滤**：正文或 `entities.cashtags` 里有 query 中的代码才保留，发帖量在过滤之后再算；query 里照样写 `$` | grokbot 的工具会吞掉 `$`，trial 2 里 `$SPY OR $QQQ` 有 82% 的帖子没有 cashtag；grokbot 不能在抓取后过滤（spec §2） (jerry) |
+| 2026-10-18 | **每天调用预算**（spec §3.5）：开盘时段（工作日 13:30–20:00 UTC）`kol_replies` 和 `crowd` 每 15 分钟 2 页，其余时段 1 页；`kol` 始终每 15 分钟 1 页；剩余低于 50 次就暂停到重置 | 配额每天 1000 次；trial 2 每轮 14 次，每 15 分钟一轮要 1344 次；按新分配约 800 次。kol 最便宜、唯一能全量覆盖，最后才砍 (jerry) |
+| 2026-10-18 | **X 黑名单 v2**：8 个账号的 `user_id` 补全，`Christophep_a` 确认保留；关键词加 `FLAI`，作为单词关键词的例外（只被垃圾使用的品牌名）；关键词同时用在 `kol_replies` 和 `crowd` | FLAI 色情 AI 女友团伙在 youngstockuser 评论区刷了 25 条；这些号注册早、有粉丝，按账号特征筛不掉；成批换号的团伙交给 Silver 按相同简介识别 (jerry) |
 
 ## 提议了但还没拍板
 - 2026-10-14 grokbot 输出规范 `docs/grokbot_x_spec.md`（信封 + `fetched_at` + 请求参数 + 补字段 + 空/失败页也输出 + since_id 翻页到底）。交给 grokbot 后，`x_raw_search.yml` 要跟着改（加 `fetched_ts`/`request_id`/`page_index`/`http_status`，`request_*` 改不可空，PIT 用 `fetched_ts`）
