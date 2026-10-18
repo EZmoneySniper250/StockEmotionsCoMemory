@@ -46,11 +46,22 @@ updated: 2026-10-18
 ## 发现的问题
 - **trial 2 的 X 原始数据已经提交进了 GitHub**（`infra/local/data/landing/x_raw_search/trial2/`，在 `c2ee29e` 里），起因是 2026-10-17 按 Jerry 的要求从 `.gitignore` 去掉了 `infra/local/data/`。代码仓库是公开的（不用登录就能调 Actions API），等于把别人的帖子公开转发了。已经告诉 Jerry，等他决定怎么处理
 
+## 同一个 session 的后续：M1 正式代码（代码仓库，未提交）
+- `src/usse/contracts.py`：读合约；`src/usse/tables.py`：合约 → `CREATE TABLE IF NOT EXISTS ... USING DELTA`（`python -m usse.tables`）
+- `src/usse/ingestion/envelope.py`：envelope 和 `RunWriter`（先写 `.tmp` 再改名 + manifest），这就是 sink；续抓游标从最近的 manifest 里取 `newest_id`，暂时不用 `_ingest_state` 表
+- `src/usse/ingestion/stocktwits.py`：沿 `cursor.since` 翻到 `more=false`，403/429/5xx 退避重试，每次重试都是新 envelope；没有游标时只抓最新一页
+- `src/usse/ingestion/xhs.py`：直接用 XHS_ALL_IN_ONE 客户端；同一轮内按笔记 id 去重再拉详情（`--max-details`）；**遇到 `code -100 登录已过期` 立刻停止整轮**
+- `src/usse/ingestion/loader.py`：一个 loader 处理四张表，递归读 `landing/<表>/` 下的 `.jsonl`，按 `request_id` 去重后追加
+- `settings.landing_root`（`USSE_LANDING_ROOT`，默认 `data/landing`）；`.env.example` 加了 landing 和小红书的变量
+- 测试 26 个全过（spark 容器里跑），ruff 0.17.1 通过
+- 端到端：本地 lakehouse 四张 brz 表建好并导入 stocktwits 15 行、xhs_raw_search 7 行、xhs_raw_note 31 行、x_raw_search 43 行；再导一次写入 0 行；`fetched_ts > ingest_ts` 为 0
+- **小红书 cookie 失效了**：真实跑的时候第一次搜索成功，之后全部 `登录已过期`（cookie 是 2026-10-12 导入的，也可能是 25 分钟内连跑两轮触发风控）。Jerry 需要从浏览器重新导出 cookie
+
 ## 决定
 - 见 [[Decisions]] 2026-10-18：所有 Bronze 表的输入统一为 envelope v1，失败调用也存，PIT 用 `fetched_ts`
 
 ## 没做完 / 下一步
-- 写正式代码：`sink.py`、`tables.py`、fetcher（stocktwits、xhs）、`loader.py`
+- 小红书 cookie 重新导出后再跑一轮；定时调度（24/7 主机，Q8）；Reddit fetcher（Q7）
 - 锁定 ruff 版本，避免 CI 随新版本突然变红
 - 原始数据进 git 的问题等 Jerry 决定
 
