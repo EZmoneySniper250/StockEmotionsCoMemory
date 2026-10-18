@@ -56,3 +56,6 @@ updated: 2026-10-12
 - 小红书（2026-10-18）：可以不起后端，直接用 XHS_ALL_IN_ONE 的 `XHS_Apis` + `XHSPcAuth.from_cookie`；搜索结果混的是 `rec_query`；"最新"排序会把最近更新过的旧笔记顶上来 (jerry)
 - CI（2026-10-18）：`requirements.txt` 里 `ruff>=0.8` 没锁版本，CI 装的是最新版；行长上限 110；本机没装 ruff 时用 `pip install --target <临时目录> ruff` 跑 `ruff check src tests scripts docker` (jerry)
 - 小红书（2026-10-18）：cookie 失效时返回 `code -100 "登录已过期"`；失效前一次详情调用可能返回 `success: true` 但 `data: {}`（客户端报 KeyError 'msg'）。遇到 -100 要停掉整轮，从浏览器重新导出 cookie (jerry)
+- Silver（2026-10-18）：小红书笔记几乎不写 `$代码`（25 条全部没有），`post_mentions` 要靠 `dim_security` 里的中文别名 (jerry)
+- Silver（2026-10-18）：FLAI 团伙的简介只是"几乎一样"（平台/平臺、标签顺序不同），`shared_author_bio` 精确匹配抓不到 (jerry)
+- Spark（2026-10-18）：`size(null)` 默认返回 -1 而不是 null（`spark.sql.legacy.sizeOfNull`），判断数组是否为空时要注意 (jerry)
