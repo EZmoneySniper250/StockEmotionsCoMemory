@@ -1,6 +1,6 @@
 ---
 tags: [project, moc, usstockemotions]
-updated: 2026-10-12
+updated: 2026-10-18
 repo: D:\USStockEmotions
 ---
 
@@ -27,6 +27,7 @@ repo: D:\USStockEmotions
 | [[Open Questions]] | Q1–Q9 及谁负责 |
 | [[Team & Ownership]] | 谁负责哪个文件夹 |
 | [[Gotchas]] | 环境的坑和怪癖 |
+| [[X Collector]] | grokbot X 采集：冻结的接口、可以改的部分、当前版本、交给 jaylen 的 prompt 任务 |
 | [[Workflow]] | 每张表的 8 步流程、git 流程、本地命令 |
 | `Sessions/` | 每个 session 的记录 |
 
@@ -36,8 +37,8 @@ repo: D:\USStockEmotions
 - `docs/architecture.md`：图
 - `docs/deltaprinciples.md`：Delta 概念问答（用 T-SQL 类比）
 - `infra/local/README.md`：怎么跑本地环境
-- `docs/grokbot_x_spec.md`：给 grokbot 的 X 采集输出规范 v1.1（2026-10-14，未提交）
-- `docs/grokbot_x_trial_prompt.md`：grokbot 试跑 prompt（Jerry 在 Grok 上手动验证，S3 还没部署）
+- `docs/grokbot_x_spec.md`：给 grokbot 的 X 采集输出规范 v1.4（2026-10-18），§0 是冻结的接口，改 prompt 前必读（摘要见 [[X Collector]]）
+- `docs/grokbot_x_trial_prompt.md`：grokbot 试跑 prompt v1.4（2026-10-18，未实测，交给 jaylen）
 
 ## Sessions
 `Sessions/` 文件夹里每个 session 一篇，文件名是 `YYYY-MM-DD <作者> <主题>`，按文件名排序就是时间顺序。这里**不再手动维护列表**，因为多人同时追加容易冲突。
