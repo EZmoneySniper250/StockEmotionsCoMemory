@@ -44,6 +44,7 @@ updated: 2026-10-12
 | 2026-10-18 | **crowd 流在 Silver 必须按 cashtag 过滤**：正文或 `entities.cashtags` 里有 query 中的代码才保留，发帖量在过滤之后再算；query 里照样写 `$` | grokbot 的工具会吞掉 `$`，trial 2 里 `$SPY OR $QQQ` 有 82% 的帖子没有 cashtag；grokbot 不能在抓取后过滤（spec §2） (jerry) |
 | 2026-10-18 | **每天调用预算**（spec §3.5）：开盘时段（工作日 13:30–20:00 UTC）`kol_replies` 和 `crowd` 每 15 分钟 2 页，其余时段 1 页；`kol` 始终每 15 分钟 1 页；剩余低于 50 次就暂停到重置 | 配额每天 1000 次；trial 2 每轮 14 次，每 15 分钟一轮要 1344 次；按新分配约 800 次。kol 最便宜、唯一能全量覆盖，最后才砍 (jerry) |
 | 2026-10-18 | **X 黑名单 v2**：8 个账号的 `user_id` 补全，`Christophep_a` 确认保留；关键词加 `FLAI`，作为单词关键词的例外（只被垃圾使用的品牌名）；关键词同时用在 `kol_replies` 和 `crowd` | FLAI 色情 AI 女友团伙在 youngstockuser 评论区刷了 25 条；这些号注册早、有粉丝，按账号特征筛不掉；成批换号的团伙交给 Silver 按相同简介识别 (jerry) |
+| 2026-10-18 | **所有 Bronze 表的输入统一为 envelope v1**（和 grokbot 同一套格式，见 `docs/grokbot_x_spec.md` §4）：一行 = 一次调用；envelope 字段成为共有列；**失败调用也存**；**PIT 用 `fetched_ts`**，`ingest_ts` 只是 loader 写入时间。plan 升 v1.3 | 一个 loader 就能处理所有数据源；有请求参数和抓取时间才能回溯血缘、做 point-in-time；没有失败记录就分不清"没人发帖"和"采集挂了"；2026-10-18 模拟采集验证过 StockTwits 和小红书都能产出这个格式 (jerry) |
 
 ## 提议了但还没拍板
 - 2026-10-14 grokbot 输出规范 `docs/grokbot_x_spec.md`（信封 + `fetched_at` + 请求参数 + 补字段 + 空/失败页也输出 + since_id 翻页到底）。交给 grokbot 后，`x_raw_search.yml` 要跟着改（加 `fetched_ts`/`request_id`/`page_index`/`http_status`，`request_*` 改不可空，PIT 用 `fetched_ts`）
