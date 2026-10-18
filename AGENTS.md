@@ -1,12 +1,12 @@
 ---
 tags: [protocol, ai, usstockemotions]
-updated: 2026-10-14
+updated: 2026-10-18
 ---
 
 # AI 协作记忆规则
 
 适用对象：Jerry、Jaylen、Linan 三个人各自用的 AI（Claude Code、Codex 等）。
-每个 AI 在 USStockEmotions 上动手之前，都要先读完这一页。修改这一页需要三个人都同意（见 §7）。
+每个 AI 在 USStockEmotions 上动手之前，都要先读完这一页。修改这一页要走 PR（见 §7）。
 
 **一句话：AI 负责写，人负责审。** AI 在自己的分支上写记忆、提 PR；审核和合并只由人来做。
 
@@ -82,8 +82,8 @@ type 的取值和 §5 commit message 的 type 一样。
 ### 4.1 AI 能做的
 
 - 创建分支、commit、push 自己的分支。
-- 开 PR：`gh pr create --base main --fill-first`，再按 `.github/pull_request_template.md` 补全描述。
-- 指定 reviewer：其他两个人之中，**按改动内容找对口的人**（见 [[Team & Ownership]]）；判断不了就两个都加。
+- 开 PR：`gh pr create --base main --fill-first`，再按 `.github/pull_request_template.md` 补全描述。如果自己的人类说由他自己开 PR，AI 就只 push 分支，并把按模板写好的标题和描述交给他。
+- 指定 reviewer：按改动内容找对口的人（见 [[Team & Ownership]]）；判断不了就不指定，谁有空谁看。
 - 人类在 PR 里提了修改意见，并且自己的人类让 AI 去改时，AI 在同一个分支上追加 commit。
 
 ### 4.2 AI 不能做的
@@ -95,9 +95,9 @@ type 的取值和 §5 commit message 的 type 一样。
 
 ### 4.3 审核和合并（只由人做）
 
-- 每个 PR 至少要 1 个**作者以外**的人 approve。
-- 改 `AGENTS.md`、`.github/`、`.gitattributes` 的 PR 要另外两人都 approve。
-- 用 **squash merge**，合并后删除分支。谁合并都可以，一般是作者本人在拿到 approve 之后合并。
+- 每个 PR 由**任何一个人**看过就可以合并，作者本人也可以（2026-10-18 起放宽，之前要求作者以外的人 approve）。
+- 改 `AGENTS.md`、`.github/`、`.gitattributes` 的 PR 也一样，但合并后要在群里告诉另外两人。
+- 用 **squash merge**，合并后删除分支。谁合并都可以，一般是作者本人。
 - 对决定有不同意见时，在 PR 里讨论，不要另开 PR 去改别人的决定。
 
 ## 5. Commit message
@@ -136,7 +136,7 @@ git push --force-with-lease          # 只允许用在自己尚未合并的分�
 
 ## 7. 修改本文件
 
-修改这一页需要三个人都同意（见 §4.3）。AI 只能提议，以 PR 的形式提交。
+修改这一页要走 PR，按 §4.3 合并，合并后告诉另外两人。AI 只能提议，以 PR 的形式提交。
 
 ## 8. 给人类的设置说明
 

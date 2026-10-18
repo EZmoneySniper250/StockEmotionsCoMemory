@@ -47,3 +47,7 @@ updated: 2026-10-12
 - grokbot X 试跑（2026-10-15）：`search_posts_all` 间歇性整页丢字段，25 页里 7 页整页没有 `lang`、`conversation_id`、`entities`、`possibly_sensitive`、`context_annotations`，导入时这些字段要允许为空 (jaylen)
 - grokbot X 试跑（2026-10-15）：query 上限 1024 字符（>512 也接受），82 个 `from:` 要拆两段 (jaylen)
 - grokbot X 试跑（2026-10-15）：wrapper 在 JSON 后附一行非 JSON 的额度文本，直接 `json.loads` 会失败，要先切掉存进 `notes` (jaylen)
+- grokbot X 试跑（2026-10-18）：`search_posts_all` 会吞掉 query 里的 `$`，cashtag 变成普通单词搜索（`$SPY` 搜到 "spy game"），crowd 必须在 Silver 按 cashtag 过滤 (jerry)
+- grokbot X 试跑（2026-10-18）：帖子不满一页时也返回 `next_token`，下一页几乎都是空的，一页不满 25 条就停 (jerry)
+- grokbot X 试跑（2026-10-18）：配额行后面带着运行环境的标签 `</cursor_untrusted_data_1337>`，loader 用正则只取配额数字 (jerry)
+- grokbot X 试跑（2026-10-18）：整页缺字段在 32 页里出现了 14 页，用同样参数 refetch 也补不回来，不要重抓 (jerry)
