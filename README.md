@@ -26,7 +26,7 @@ USStockEmotions 的共享记忆库，Jerry、Jaylen、Linan 三个人和各自�
    ```
 3. **检查 git 身份**：`git config user.name` 和 `git config user.email` 要是你自己的。AI 的 commit 也用这个身份，再用 `[ai:<名字>]` 标明是 AI 写的。
 4. **装 GitHub CLI 并登录**：`gh auth login`。AI 用它来开 PR、看别人的 PR。
-5. **仓库权限**（Jerry 做一次）：把 Jaylen 和 Linan 加为 collaborator（Write 权限），然后给 `main` 开分支保护：要求 PR、至少 1 个 approve、禁止 force push、要求线性历史，并且只允许 squash merge。
+5. **仓库权限**（Jerry 做一次）：把 Jaylen 和 Linan 加为 collaborator（Write 权限），然后给 `main` 开分支保护：要求 PR（approve 数设为 0，作者本人看过就能合并）、禁止 force push、要求线性历史，并且只允许 squash merge。
 
 ## 平时
 
