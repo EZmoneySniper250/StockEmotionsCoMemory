@@ -51,3 +51,7 @@ updated: 2026-10-12
 - grokbot X 试跑（2026-10-18）：帖子不满一页时也返回 `next_token`，下一页几乎都是空的，一页不满 25 条就停 (jerry)
 - grokbot X 试跑（2026-10-18）：配额行后面带着运行环境的标签 `</cursor_untrusted_data_1337>`，loader 用正则只取配额数字 (jerry)
 - grokbot X 试跑（2026-10-18）：整页缺字段在 32 页里出现了 14 页，用同样参数 refetch 也补不回来，不要重抓 (jerry)
+- StockTwits（2026-10-18 模拟采集）：带浏览器 UA 也会偶尔被 Cloudflare 拦（403 "Just a moment..."，约 1/5），要退避重试 (jerry)
+- StockTwits（2026-10-18）：`since=<id>` 返回紧跟在这个 id 之后的 30 条，`cursor.more` 表示后面还有；沿 `cursor.since` 翻到 `more=false` 不漏数据 (jerry)
+- 小红书（2026-10-18）：可以不起后端，直接用 XHS_ALL_IN_ONE 的 `XHS_Apis` + `XHSPcAuth.from_cookie`；搜索结果混的是 `rec_query`；"最新"排序会把最近更新过的旧笔记顶上来 (jerry)
+- CI（2026-10-18）：`requirements.txt` 里 `ruff>=0.8` 没锁版本，CI 装的是最新版；行长上限 110；本机没装 ruff 时用 `pip install --target <临时目录> ruff` 跑 `ruff check src tests scripts docker` (jerry)
