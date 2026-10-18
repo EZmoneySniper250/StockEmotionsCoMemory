@@ -45,6 +45,9 @@ updated: 2026-10-12
 | 2026-10-18 | **每天调用预算**（spec §3.5）：开盘时段（工作日 13:30–20:00 UTC）`kol_replies` 和 `crowd` 每 15 分钟 2 页，其余时段 1 页；`kol` 始终每 15 分钟 1 页；剩余低于 50 次就暂停到重置 | 配额每天 1000 次；trial 2 每轮 14 次，每 15 分钟一轮要 1344 次；按新分配约 800 次。kol 最便宜、唯一能全量覆盖，最后才砍 (jerry) |
 | 2026-10-18 | **X 黑名单 v2**：8 个账号的 `user_id` 补全，`Christophep_a` 确认保留；关键词加 `FLAI`，作为单词关键词的例外（只被垃圾使用的品牌名）；关键词同时用在 `kol_replies` 和 `crowd` | FLAI 色情 AI 女友团伙在 youngstockuser 评论区刷了 25 条；这些号注册早、有粉丝，按账号特征筛不掉；成批换号的团伙交给 Silver 按相同简介识别 (jerry) |
 | 2026-10-18 | **所有 Bronze 表的输入统一为 envelope v1**（和 grokbot 同一套格式，见 `docs/grokbot_x_spec.md` §4）：一行 = 一次调用；envelope 字段成为共有列；**失败调用也存**；**PIT 用 `fetched_ts`**，`ingest_ts` 只是 loader 写入时间。plan 升 v1.3 | 一个 loader 就能处理所有数据源；有请求参数和抓取时间才能回溯血缘、做 point-in-time；没有失败记录就分不清"没人发帖"和"采集挂了"；2026-10-18 模拟采集验证过 StockTwits 和小红书都能产出这个格式 (jerry) |
+| 2026-10-18 | **`slv.posts` 合约定稿**：PIT 用 `available_ts`（最早一次 `fetched_ts`）；互动数只存最新快照、不满足 PIT；X `includes.tweets` 不算帖子；小红书只有拉过详情的笔记才算；作者只存加盐 hash（`USSE_AUTHOR_SALT`，三人共用）；`lang` 只用来源自带的；`matched_query_ids` 保留所有来源 query；`is_cashtag_verified` 标记 crowd 帖子是否真有 cashtag；用 `first_request_id` 而不是抓取次数 | Bronze 已经把 `fetched_ts` 定为 PIT；快照数会随时间变；引用原帖不是 query 搜到的，算进来会虚增热度；不存原始作者 id；所有合并规则必须幂等（P6），次数在重跑时会累加 (jerry) |
+| 2026-10-18 | **垃圾识别现在只用规则（`spam_v1`），不上 ML 模型**；以后要上，放在旁路表 `slv.post_quality_scores`（按 `model_version`），不插在 brz 和 slv 之间 | 没有标注数据；现在的垃圾主要是团伙，按账号群体的规则更准、更好解释；插在中间会破坏 P4 可重建和 P5 版本化，还有前视偏差。M5 让 LLM 顺带输出 `is_spam`，攒标注 (jerry) |
+| 2026-10-18 | 基建进度用 [[Phases & Milestones]] 里的 Mermaid 甘特图；需要任务看板时再开 GitHub Projects | Obsidian 和 GitHub 都能直接渲染，三人不用装新工具；跟记忆库一起更新，不会和文字记录对不上 (jerry) |
 
 ## 提议了但还没拍板
 - 2026-10-14 grokbot 输出规范 `docs/grokbot_x_spec.md`（信封 + `fetched_at` + 请求参数 + 补字段 + 空/失败页也输出 + since_id 翻页到底）。交给 grokbot 后，`x_raw_search.yml` 要跟着改（加 `fetched_ts`/`request_id`/`page_index`/`http_status`，`request_*` 改不可空，PIT 用 `fetched_ts`）
