@@ -55,3 +55,4 @@ updated: 2026-10-12
 - StockTwits（2026-10-18）：`since=<id>` 返回紧跟在这个 id 之后的 30 条，`cursor.more` 表示后面还有；沿 `cursor.since` 翻到 `more=false` 不漏数据 (jerry)
 - 小红书（2026-10-18）：可以不起后端，直接用 XHS_ALL_IN_ONE 的 `XHS_Apis` + `XHSPcAuth.from_cookie`；搜索结果混的是 `rec_query`；"最新"排序会把最近更新过的旧笔记顶上来 (jerry)
 - CI（2026-10-18）：`requirements.txt` 里 `ruff>=0.8` 没锁版本，CI 装的是最新版；行长上限 110；本机没装 ruff 时用 `pip install --target <临时目录> ruff` 跑 `ruff check src tests scripts docker` (jerry)
+- 小红书（2026-10-18）：cookie 失效时返回 `code -100 "登录已过期"`；失效前一次详情调用可能返回 `success: true` 但 `data: {}`（客户端报 KeyError 'msg'）。遇到 -100 要停掉整轮，从浏览器重新导出 cookie (jerry)
