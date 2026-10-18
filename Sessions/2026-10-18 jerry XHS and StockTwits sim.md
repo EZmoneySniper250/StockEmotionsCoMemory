@@ -50,7 +50,7 @@ updated: 2026-10-18
 - `src/usse/contracts.py`：读合约；`src/usse/tables.py`：合约 → `CREATE TABLE IF NOT EXISTS ... USING DELTA`（`python -m usse.tables`）
 - `src/usse/ingestion/envelope.py`：envelope 和 `RunWriter`（先写 `.tmp` 再改名 + manifest），这就是 sink；续抓游标从最近的 manifest 里取 `newest_id`，暂时不用 `_ingest_state` 表
 - `src/usse/ingestion/stocktwits.py`：沿 `cursor.since` 翻到 `more=false`，403/429/5xx 退避重试，每次重试都是新 envelope；没有游标时只抓最新一页
-- `src/usse/ingestion/xhs.py`：直接用 XHS_ALL_IN_ONE 客户端；同一轮内按笔记 id 去重再拉详情（`--max-details`）；**遇到 `code -100 登录已过期` 立刻停止整轮**
+- `src/usse/ingestion/xhs.py`：直接用 XHS_ALL_IN_ONE 客户端；同一轮内按笔记 id 去重再拉详情（`--details-per-keyword`，每个关键词各自一个上限）；**遇到 `code -100 登录已过期` 立刻停止整轮**
 - `src/usse/ingestion/loader.py`：一个 loader 处理四张表，递归读 `landing/<表>/` 下的 `.jsonl`，按 `request_id` 去重后追加
 - `settings.landing_root`（`USSE_LANDING_ROOT`，默认 `data/landing`）；`.env.example` 加了 landing 和小红书的变量
 - 测试 26 个全过（spark 容器里跑），ruff 0.17.1 通过
