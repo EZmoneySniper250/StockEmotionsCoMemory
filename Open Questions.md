@@ -1,6 +1,6 @@
 ---
 tags: [usstockemotions, open-questions]
-updated: 2026-10-12
+updated: 2026-10-18
 ---
 
 # Open Questions
@@ -24,3 +24,5 @@ updated: 2026-10-12
 | Q11 | 小红书要不要正式纳入 Phase 1？工具不能商用，依赖个人账号 cookie，有封号风险，内容很多是 A 股 / 中文语境 | Jerry + 团队 | M1 | OPEN（2026-10-12） |
 | Q12 | 小红书关键词表：按股票池自动生成（中文名 + ticker + "股票"），还是手工维护 | Jerry + Jaylen | M1 | OPEN（2026-10-12） |
 | Q13 | 小红书评论要不要采？量大，但情绪信息多 | Jerry + Linan | M1 | OPEN（2026-10-12） |
+| Q14 | youngstockuser 的评论区几乎被 FLAI 垃圾团伙占领（trial 2 里 26 条回复有 25 条），它还留在 `kol_replies` 里吗？ | Jaylen | M1 X | OPEN（jerry 2026-10-18） |
+| Q15 | 白名单混着新闻和资讯号（MarketWatch、zerohedge、WatcherGuru、DeItaone、unusual_whales 等），要不要加 `kind: news \| kol` 分开统计？加字段属于名单格式变更，要按 [[X Collector]] 走 PR | Jaylen | M3 | OPEN（jerry 2026-10-18） |
