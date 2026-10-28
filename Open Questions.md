@@ -1,6 +1,6 @@
 ---
 tags: [usstockemotions, open-questions]
-updated: 2026-10-18
+updated: 2026-10-27
 ---
 
 # Open Questions
@@ -10,7 +10,7 @@ updated: 2026-10-18
 | # | 问题 | 负责人 | 卡住哪个里程碑 | 状态 |
 |---|---|---|---|---|
 | Q1 | Score 的含义：方向、风险还是关注度（或者多个 score） | Jaylen + Linan | M6 | OPEN |
-| Q2 | 股票池（半导体？S&P 100？） | Linan + Jaylen | M1（可先用临时名单）、M2 | OPEN，**现在就要** |
+| Q2 | 股票池（半导体？S&P 100？） | Linan + Jaylen | M1（可先用临时名单）、M2 | OPEN，**现在就要**。jerry 2026-10-27：先用 23 只的临时股票池（`infra/local/seeds/security_master.csv`）；`slv.post_mentions` 里 `entity_type = unmapped` 的行就是候选名单，2026-10-18 的数据里最多的是 SPCX 33、BTC.X 21、DJT 15、NDAQ 7（NDAQ 可能被当成纳指来用） |
 | Q3 | 行业分类：GICS 一级还是自定义 | Jerry + Jaylen | M2 | OPEN |
 | Q4 | 4h bucket 怎么对齐、用哪个时区（提议：美东时间从午夜开始切） | Jerry + Linan | M4 | OPEN |
 | Q5 | `post_labels.topic` 的 topic 分类体系 | Jaylen | M5 | OPEN |
