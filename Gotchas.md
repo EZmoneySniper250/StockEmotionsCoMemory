@@ -59,3 +59,5 @@ updated: 2026-10-12
 - Silver（2026-10-18）：小红书笔记几乎不写 `$代码`（25 条全部没有），`post_mentions` 要靠 `dim_security` 里的中文别名 (jerry)
 - Silver（2026-10-18）：FLAI 团伙的简介只是"几乎一样"（平台/平臺、标签顺序不同），`shared_author_bio` 精确匹配抓不到 (jerry)
 - Spark（2026-10-18）：`size(null)` 默认返回 -1 而不是 null（`spark.sql.legacy.sizeOfNull`），判断数组是否为空时要注意 (jerry)
+- Windows / Git Bash（2026-10-27）：用 bash heredoc 把含中文的 Python 脚本喂给 `python -` 时，Python 按 GBK 读 stdin，中文字符串匹配会失败。含中文的改动用编辑工具，或者先写成 UTF-8 文件再跑 (jerry)
+- Spark（2026-10-27）：`docker compose exec` 跑 job 时，最后 `print` 的结果和 Spark 进度条在同一"行"（中间用回车符 CR 分隔），`grep -v Stage` 会把结果一起过滤掉。先用 `tr` 把 CR 换成换行再 grep (jerry)

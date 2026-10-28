@@ -20,8 +20,8 @@ source: docs/dev_plan.md §2, docs/data_platform_plan.md §1.3 §10
 |---|---|---|---|---|
 | M0 | 本地环境（Spark + RustFS + metastore + Delta + dbt + CI） | 1 | ✅ 2026-10-10 完成 | — |
 | **M1** | Bronze 采集，7×24 运行：`tables.py`（根据合约生成 DDL）、envelope + `RunWriter`（即 sink）、StockTwits/小红书 fetcher、通用 `loader.py`；grokbot 直接写 envelope。落地目录是 `<lake>/landing/<table>/`，**不能放在 `<lake>/brz/` 的表目录里**（VACUUM 会删掉 Delta log 没记录的文件） | 2 | 🟡 代码完成（jerry 2026-10-18，26 个测试，本地端到端跑通）；还差：24/7 主机上的定时调度、Reddit fetcher | Q7（Reddit）、Q8（主机） |
-| M2 | 参考数据：`dim_security`（SCD2，FIGI）、`dim_sector`、`etf_map` | 3 | 未开始 | Q2、Q3（SCD2 机制可以先用 fixture 做） |
-| M3 | Silver：`posts`、`post_mentions`（规则部分）、`_quarantine`、`_dq_results`、按 watermark 增量处理 | 4、5 | 🟡 进行中（jerry 2026-10-18：`slv.posts` 完成，真实数据 665 条；还差 `post_mentions`（等 M2）、`_dq_results`） | `post_mentions` 依赖 M2 |
+| M2 | 参考数据：`dim_security`（SCD2，FIGI）、`dim_sector`、`etf_map` | 3 | 🟡 jerry 2026-10-27：`dim_security`（临时股票池 23 只，含中文别名）和 `etf_map` 完成；`dim_sector` 等 Q3 | Q2、Q3（SCD2 机制可以先用 fixture 做） |
+| M3 | Silver：`posts`、`post_mentions`（规则部分）、`_quarantine`、`_dq_results`、按 watermark 增量处理 | 4、5 | 🟡 进行中（jerry 2026-10-18：`slv.posts` 完成，真实数据 665 条；jerry 2026-10-27：`_dq_results` + Gold gate + Bronze DQ + `brz._quarantine` 完成；jerry 2026-10-27：`post_mentions`（规则 `mentions_v1`）完成，**Silver 规则部分全部完成**） | `post_mentions` 依赖 M2 |
 | M4 | Gold 薄切片（dbt）：维度表、`fct_post_sentiment`、三张 `agg_*_4h` | 6 | 未开始 | Q4、Q9 |
 | M5 | LLM 打标签任务 → `post_labels` | 7 | 未开始 | Q5 |
 | M6 | 价格、`fct_score`、`fct_alert`、`fct_alert_outcome` | 8、9 | 未开始 | Q1、Q6 |
@@ -46,10 +46,12 @@ gantt
     Trial 2 + spec v1.4 freeze            :done, x2, 2026-10-18, 1d
     Production prompt (jaylen)            :active, x3, 2026-10-19, 5d
     section Reference
-    M2 dim_security, sectors (Q2, Q3)     :m2, 2026-10-21, 7d
+    M2 dim_security + etf_map (seed)      :done, m2, 2026-10-27, 1d
+    M2 dim_sector (Q3)                    :m2b, after m2, 3d
     section Thin slice
     M3 slv.posts                          :done, m3a, 2026-10-18, 1d
-    M3 post_mentions + DQ                 :m3b, after m2, 5d
+    M3 DQ + gate                          :done, m3c, 2026-10-27, 1d
+    M3 post_mentions                      :done, m3b, 2026-10-27, 1d
     M4 Gold thin slice (Q4, Q9)           :m4, after m3b, 10d
     section Depth
     M5 LLM labeling (Q5)                  :m5, after m3a, 10d
