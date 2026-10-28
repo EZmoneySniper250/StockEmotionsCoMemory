@@ -40,10 +40,17 @@ updated: 2026-10-27
 - 测试 46 个全过（新增 17 个），ruff 通过（`learningpath.ipynb` 有一个 import 顺序的 lint 错误，不是这次改的）
 - 真实数据：先跑一次，gate 挡住了，因为 10-18 那次写入没有 DQ 记录，规则是对的。删掉 `slv.posts` 的 watermark 全量重建，665 条不变；error 检查全部 pass，垃圾帖比例 stocktwits 11%、x 10%、xhs 0%，隔离率 0；量跌检查全部 skipped（最近 4 小时没有采集）；gate open
 
+## 第三段：Bronze DQ 和坏行隔离（`feat/brz-slv-posts`，未提交，这一波做完一起提交）
+- 新合约 `contracts/brz/_quarantine.yml`：landing 里读不了的行（`malformed_json`、`bad_envelope`），主键是 `(source_table, source_file, line_no)`。不放进 `slv._quarantine`，因为那张表的 `request_id` 不能为空，而且 Bronze 不该写进 slv schema
+- `loader.py`：坏行进 `brz._quarantine`，其他行照常加载；loader 每次重扫整个 landing，用主键做 anti-join，同一个坏行不会重复隔离。extractor 和合约对不上仍然直接报错（这是代码 bug，不是坏数据）。每次 load 结尾跑 Bronze DQ，写进 `slv._dq_results`（`job = loader`，`job_run_id = batch_id`）；`main()` 最后过一次 gate，关着就 exit 1
+- `src/usse/dq/brz.py`：`request_id_unique`、`ok_calls_have_payload`、`fetched_le_ingest`、`result_count_matches_payload`（按表从 payload 数帖子，注意 `size(null) = -1`）、`not_null_source_post_id`、`error_rate_by_run`（本次 load 的行按采集 `run_id` 分组，阈值 0.2）、`hourly_volume_drop`（按 `result_count` 求和，所以"调用成功但返回空"也能抓到，比如小红书 cookie 刚过期的时候）
+- `RunContext`、`run_checks` 挪到 `dq/core.py`，brz 和 slv 共用
+- `docs/data_platform_plan.md` 升到 v1.4：§6 加 `brz._quarantine`，§7.6 写清 DQ 级别和 Gold gate
+- 测试 55 个全过，ruff 通过。真实数据：4 张 Bronze 表的检查全部 pass 或 skipped，X 的 `result_count` 和 payload 对得上，landing 没有坏行
+
 ## 下一步（更新）
-- loader 遇到坏 JSON 行，改成进 `_quarantine`，不要整次失败
-- Bronze 的 DQ 检查（loader 结尾跑：`request_id_unique`、`error_rate_by_run`、`hourly_volume_drop` 等）
-- M2 `dim_security`（含中文别名）→ `slv.post_mentions`
+- Silver 只剩 `slv.post_mentions`，它要先有 M2 `dim_security`（含中文别名），Q2、Q3 没定的话先用 fixture
+- 然后开始规划 Gold
 
 ## 相关
 - [[Phases & Milestones]]
