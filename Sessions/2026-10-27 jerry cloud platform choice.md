@@ -31,6 +31,20 @@ updated: 2026-10-27
 - 代码仓库的改动还没提交（2026-10-18 的 brz/slv 加上这次的改动）
 - 下一步写代码：`slv._dq_results` → M2 `dim_security`（含中文别名）→ `slv.post_mentions`
 
+## 后半段：`slv._dq_results`（代码仓库分支 `feat/brz-slv-posts`，未提交）
+- 讨论了 DQ 和 run log 的区别：run log 看 job 跑得怎么样，DQ 看数据对不对，重点是"job 没报错，但数据错了"（比如小红书 cookie 过期，job 成功、写入 0 行）。运行计数作为 `info` 行写进 `_dq_results`，不单独建 run log 表
+- Auto Loader 和 `_rescued_data` 是 Databricks 独有的，现在不用。Bronze 存原始 `payload` 字符串，已经起到 rescue 的作用；真正的漏洞是 landing 里有一行坏 JSON 会让整次 load 失败（`loader.py` 的 `json.loads`），**还没修**
+- 合约 `contracts/slv/_dq_results.yml`；`contracts.py` 读取 `dq_checks`
+- `src/usse/dq/`：`core.py`（`Result`、`SEVERITY`、`record`、`gate`，命令行 `python -m usse.dq.core slv.posts`，gate 关着就 exit 1）、`checks.py`（`pk_unique`、`violations`、`rate_by`、`ratio`、`volume_drop`、`run_stats`）、`slv.py`（slv 合约里每项检查的实现和阈值）
+- `slv.posts` 的 `run()` 结尾跑检查，没有新数据也跑；有 error 失败时 `main()` exit 1
+- 测试 46 个全过（新增 17 个），ruff 通过（`learningpath.ipynb` 有一个 import 顺序的 lint 错误，不是这次改的）
+- 真实数据：先跑一次，gate 挡住了，因为 10-18 那次写入没有 DQ 记录，规则是对的。删掉 `slv.posts` 的 watermark 全量重建，665 条不变；error 检查全部 pass，垃圾帖比例 stocktwits 11%、x 10%、xhs 0%，隔离率 0；量跌检查全部 skipped（最近 4 小时没有采集）；gate open
+
+## 下一步（更新）
+- loader 遇到坏 JSON 行，改成进 `_quarantine`，不要整次失败
+- Bronze 的 DQ 检查（loader 结尾跑：`request_id_unique`、`error_rate_by_run`、`hourly_volume_drop` 等）
+- M2 `dim_security`（含中文别名）→ `slv.post_mentions`
+
 ## 相关
 - [[Phases & Milestones]]
 - [[Decisions]]
