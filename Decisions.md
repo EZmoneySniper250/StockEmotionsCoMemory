@@ -55,3 +55,4 @@ updated: 2026-10-12
 - 采集放在常开的小 VM 上（EC2 t4g.small / Lightsail），直接写真实 S3（Q8）
 - 拿到 GitHub 用户名后加 `.github/CODEOWNERS`
 - 加 nbstripout git hook，提交时自动清空 notebook 输出
+| 2026-10-27 | **业务代码写成平台中立的，云平台晚点定，倾向 Databricks + S3（不用 EMR）**。规则：不用 `sparkContext` / `.rdd` / `_jvm`；只用 OSS Delta 3.2 的功能；表按名字读写，不用路径；环境相关的东西只放在 `settings.py`、`spark.py`、`bootstrap.py`；合约按包内资源读。`main()` 里的盐值已经改成 `settings.load_author_salt()`。M8 的目标和 plan 在 trial 看过 DBU 账单后再改 | Databricks 调试方便（notebook、Spark UI、Databricks Connect），原生支持 Delta、Auto Loader、Jobs、Unity Catalog、dbt-databricks，jerry 有 DEA 证书；我们的数据源都没有 managed connector，fetcher 还是自己写，放在 Databricks 外面常驻；本地 pyspark 3.5.3 + delta 3.2.1 对应 DBR 15.4 LTS，守住这几条规则，迁移时只改配置和 bootstrap；成本和三人账号还没确认，所以先不改 plan (jerry) |
