@@ -48,9 +48,19 @@ updated: 2026-10-27
 - `docs/data_platform_plan.md` 升到 v1.4：§6 加 `brz._quarantine`，§7.6 写清 DQ 级别和 Gold gate
 - 测试 55 个全过，ruff 通过。真实数据：4 张 Bronze 表的检查全部 pass 或 skipped，X 的 `result_count` 和 payload 对得上，landing 没有坏行
 
+## 第四段：M2 参考数据和 `slv.post_mentions`（`feat/brz-slv-posts`，未提交）
+- 合约：`slv/dim_security.yml`（SCD2，主键 `(figi, valid_from)`）、`slv/etf_map.yml`、`slv/post_mentions.yml`（主键 `(post_id, entity_type, entity_id)`）
+- seed：`infra/local/seeds/security_master.csv`（23 只，FIGI 是 2026-10-27 从 OpenFIGI 查的；META 有两个版本，2022-06-09 之前是 FB）、`etf_map.csv`、`README.md`
+- `jobs/slv/reference.py`：seed → SCD2（`valid_to` = 同一个 FIGI 下一个版本的 `valid_from`），hash 没变就不重写
+- `jobs/slv/post_mentions.py`：cashtag 按发帖时间 as-of join、小红书别名、ETF 映射到市场或行业、映射不到的留下；增量按 `posts.processed_ts`，参考数据重建过就全量重算；改过的帖子在**同一个 MERGE** 里删掉不再匹配的行（tombstone），读的人不会看到只剩一半 mention 的帖子
+- DQ：`dim_security`（主键、有效期、每个 FIGI 只有一个当前版本、同一个 FIGI 和同一个 ticker 有效期都不重叠）、`etf_map`（ETF 必须在 `dim_security` 里）、`post_mentions`（主键、`post_id` 必须在 posts 里、映射不到的比例 > 0.5 记 `warn`）
+- plan v1.4 §7.2、§7.4 已更新。测试 66 个全过，ruff 通过
+- 真实数据：665 条帖子里 259 条有 mention，共 822 行；映射不到的比例 StockTwits 27%、X 39%；小红书靠别名得到 29 个 mention（英伟达 10、特斯拉 8、美光 5……）；DQ 全部通过
+
 ## 下一步（更新）
-- Silver 只剩 `slv.post_mentions`，它要先有 M2 `dim_security`（含中文别名），Q2、Q3 没定的话先用 fixture
-- 然后开始规划 Gold
+- **Silver 规则部分做完了**，这一波（`feat/brz-slv-posts`）可以一起提交
+- `dim_sector` 等 Q3；股票池等 Q2（看 unmapped 的候选）
+- 开始规划 Gold（M4）
 
 ## 相关
 - [[Phases & Milestones]]
