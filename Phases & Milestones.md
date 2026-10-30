@@ -1,6 +1,6 @@
 ---
 tags: [usstockemotions, roadmap]
-updated: 2026-10-18
+updated: 2026-10-29
 source: docs/dev_plan.md §2, docs/data_platform_plan.md §1.3 §10
 ---
 
@@ -16,21 +16,23 @@ source: docs/dev_plan.md §2, docs/data_platform_plan.md §1.3 §10
 ## 基建里程碑（Jerry）
 排期是指示性的，从 2026-10-12 开始按周算。和 plan §10 原顺序比，有一处改动：**Bronze 采集提到最前面**，因为 StockTwits 拿不到历史数据。
 
+**第二处改动（jerry 2026-10-29）：M5 LLM 打标签提到 M4 Gold 前面**，编号不变，只改顺序。实测只有 21% 的帖子有用户标签，用它做出来的 Gold 大部分帖子没有情绪，见 [[Decisions]] 2026-10-29 和 [[2026-10-29 jerry llm labeling rationale]]。
+
 | M | 内容 | Plan step | 状态 | 被谁卡住 |
 |---|---|---|---|---|
 | M0 | 本地环境（Spark + RustFS + metastore + Delta + dbt + CI） | 1 | ✅ 2026-10-10 完成 | — |
 | **M1** | Bronze 采集，7×24 运行：`tables.py`（根据合约生成 DDL）、envelope + `RunWriter`（即 sink）、StockTwits/小红书 fetcher、通用 `loader.py`；grokbot 直接写 envelope。落地目录是 `<lake>/landing/<table>/`，**不能放在 `<lake>/brz/` 的表目录里**（VACUUM 会删掉 Delta log 没记录的文件） | 2 | 🟡 代码完成（jerry 2026-10-18，26 个测试，本地端到端跑通）；还差：24/7 主机上的定时调度、Reddit fetcher | Q7（Reddit）、Q8（主机） |
 | M2 | 参考数据：`dim_security`（SCD2，FIGI）、`dim_sector`、`etf_map` | 3 | 🟡 jerry 2026-10-27：`dim_security`（临时股票池 23 只，含中文别名）和 `etf_map` 完成；`dim_sector` 等 Q3 | Q2、Q3（SCD2 机制可以先用 fixture 做） |
 | M3 | Silver：`posts`、`post_mentions`（规则部分）、`_quarantine`、`_dq_results`、按 watermark 增量处理 | 4、5 | 🟡 进行中（jerry 2026-10-18：`slv.posts` 完成，真实数据 665 条；jerry 2026-10-27：`_dq_results` + Gold gate + Bronze DQ + `brz._quarantine` 完成；jerry 2026-10-27：`post_mentions`（规则 `mentions_v1`）完成，**Silver 规则部分全部完成**） | `post_mentions` 依赖 M2 |
-| M4 | Gold 薄切片（dbt）：维度表、`fct_post_sentiment`、三张 `agg_*_4h` | 6 | 未开始 | Q4、Q9 |
-| M5 | LLM 打标签任务 → `post_labels` | 7 | 未开始 | Q5 |
+| M4 | Gold 薄切片（dbt）：维度表、`fct_post_sentiment`、`agg_ticker/market_sentiment_4h`（行业等 Q3） | 7 | 未开始；**排在 M5 之后**（jerry 2026-10-29） | M5、Q4 |
+| M5 | LLM 打标签任务 → `brz.llm_label_raw` → `slv.post_labels`；先试跑（约 200 条带用户标签的 StockTwits 帖子，看一致率）再全量；`topic` 等 Q5 | 6 | 未开始；架构已写进 plan v1.5 §7.3（jerry 2026-10-29）；**下一个做** | Q16（模型、试跑门槛） |
 | M6 | 价格、`fct_score`、`fct_alert`、`fct_alert_outcome` | 8、9 | 未开始 | Q1、Q6 |
 | M7 | `obt_ticker_4h`、agent 视图、`fct_agent_run` | 10 | 未开始 | — |
 | M8 | Terraform 部署到 AWS（EMR Serverless、Glue、S3、IAM） | 11 | 未开始 | — |
 
 ```mermaid
 gantt
-    title Data infra progress (updated 2026-10-18)
+    title Data infra progress (updated 2026-10-29)
     dateFormat YYYY-MM-DD
     axisFormat %m-%d
     todayMarker on
@@ -52,9 +54,9 @@ gantt
     M3 slv.posts                          :done, m3a, 2026-10-18, 1d
     M3 DQ + gate                          :done, m3c, 2026-10-27, 1d
     M3 post_mentions                      :done, m3b, 2026-10-27, 1d
-    M4 Gold thin slice (Q4, Q9)           :m4, after m3b, 10d
+    M5 LLM labeling, pilot first (Q16)    :m5, after m3b, 10d
+    M4 Gold thin slice (Q4)               :m4, after m5, 10d
     section Depth
-    M5 LLM labeling (Q5)                  :m5, after m3a, 10d
     M6 Prices, score, alerts (Q1, Q6)     :m6, after m4, 14d
     M7 OBT, agent views                   :m7, after m6, 7d
     section Cloud

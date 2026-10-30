@@ -1,6 +1,6 @@
 ---
 tags: [usstockemotions, data-model]
-updated: 2026-10-12
+updated: 2026-10-29
 source: docs/data_platform_plan.md §2 §4 §6–§8
 ---
 
@@ -35,6 +35,7 @@ source: docs/data_platform_plan.md §2 §4 §6–§8
 | `x_raw_search` | 一页 X 搜索（≤25 条） | `collector`、`request_query`、`result_count`、`newest_id`、`oldest_id`、`next_token` | ✅ |
 | `reddit_raw` | 一次 listing 响应 | `subreddit` | 未写 |
 | `prices_raw` | 一次供应商响应 | 等 Q6 | 未写 |
+| `llm_label_raw` | 打标签任务的一次 LLM 调用（多条帖子） | `label_version`、`post_ids`、token 数 | 未写（M5，2026-10-29） |
 | `_ingest_state` | 一个 source × endpoint 的 cursor | | 未写 |
 
 ## Silver（`slv`）：以实体为中心，接近 3NF，按 PK MERGE
@@ -42,7 +43,7 @@ source: docs/data_platform_plan.md §2 §4 §6–§8
 |---|---|---|
 | `posts` | 一个唯一的帖子 | PK = source + source_post_id；`author_hash`（不存原始 ID）；`ingest_ts` 取最早，会变的字段取最新 |
 | `post_mentions` | 帖子 × 实体（桥接表） | cashtag / ETF map / LLM；ticker→FIGI 用 **as-of join** 关联 `dim_security`；映射不上的进 quarantine |
-| `post_labels` | 帖子 × 实体 × label_version | sentiment −1..1、stance、topic；由打标签任务生成 |
+| `post_labels` | 帖子 × 实体 × label_version | sentiment −1..1、stance、topic（等 Q5）；由 LLM 打标签任务生成，从 `brz.llm_label_raw` 解析，能从 Bronze 重建；StockTwits 用户标签只用来验证（2026-10-29） |
 | `dim_security` | 一只证券 × 一个有效期 | SCD2，FIGI |
 | `dim_sector`、`etf_map` | | Q3 未定 |
 | `prices_1h` | symbol × 小时 | |
